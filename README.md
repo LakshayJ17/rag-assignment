@@ -48,7 +48,6 @@ npm run dev
 ![Chat – dark](public/screenshots/chat-dark.png)
 ![Chat – light](public/screenshots/chat-light.png)
 
-> Tip: If you don’t have these images yet, place your screenshots/GIFs in `public/screenshots/` using the names above, or update the paths.
 
 ## Frontend details
 
