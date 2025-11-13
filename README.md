@@ -70,7 +70,7 @@ The application implements a complete Retrieval-Augmented Generation (RAG) pipel
 
 1. **Clone the repository**
 ```bash
-git clone <repository-url>
+git clone https://github.com/LakshayJ17/rag-assignment.git
 cd buildfast-assignment
 ```
 
@@ -81,7 +81,7 @@ npm install
 
 3. **Set up environment variables**
 
-Create a `.env.local` file in the root directory:
+Create a `.env` file in the root directory:
 
 ```env
 # OpenAI API Key
@@ -118,6 +118,7 @@ buildfast-assignment/
 │   ├── components/
 │   │   ├── ChatInterface.tsx     # Message bubble component
 │   │   └── Header.tsx            # Navigation header
+|   |   └── ThemeToggle.tsx       # Theme Toggle
 │   ├── upload/
 │   │   └── page.tsx              # Upload interface page
 │   ├── globals.css               # Global styles
@@ -125,10 +126,11 @@ buildfast-assignment/
 │   └── page.tsx                  # Landing page
 ├── utils/
 │   └── chunkText.ts              # Text chunking utility
+├── lib/
+│   └── stream.ts              
 ├── public/                       # Static assets
 ├── package.json
 ├── tsconfig.json
-├── tailwind.config.ts
 └── next.config.ts
 ```
 
