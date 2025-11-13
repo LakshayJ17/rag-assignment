@@ -7,8 +7,8 @@ import { chunkText } from '@/utils/chunkText';
 import pdfParse from "pdf-parse-fork";
 
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! as string });
-const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! as string })
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY as string });
+const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY as string })
 
 
 export async function POST(req: NextRequest) {
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
         if (!file) {
             return NextResponse.json(
-                { error: 'No uploaded file' },
+                { success : false, message: 'No uploaded file' },
                 { status: 400 }
             );
         }
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
         if (!fileText || fileText.trim().length === 0) {
             return NextResponse.json(
-                { error: "No text extracted from PDF" },
+                { success : false, message: "No text extracted from PDF" },
                 { status: 400 }
             );
         }
@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
         // Chunking
         const textChunks = chunkText(fileText)
         // console.log("Text chunks : ", textChunks);
+
 
         // Embedding 
         const embeddings = await openai.embeddings.create({
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
 
         // console.log(embeddings)
 
-        
+
         // Storing in vector db - pineconedb
         const indexName = process.env.PINECONE_INDEX_NAME as string;
         const existingIndexes = await pc.listIndexes();
@@ -85,10 +86,9 @@ export async function POST(req: NextRequest) {
 
 
         const pdfName = file.name.replace(/\.[^/.]+$/, "");
-        const namespace = `${pdfName}_${Date.now()}`;
 
         const vectors = embeddings.data.map((item, i) => ({
-            id: `${namespace}_chunk_${i}`,
+            id: `chunk_${Date.now()}_${i}`,
             values: item.embedding,
             metadata: {
                 text: textChunks[i],
@@ -99,19 +99,22 @@ export async function POST(req: NextRequest) {
 
 
         const index = pc.index(indexName)
-        await index.namespace(namespace).upsert(vectors)
-        console.log(`Successfully added vectors into DB : ${namespace} `)
+        await index.upsert(vectors)
+        console.log(`Successfully added vectors into DB  `)
 
         return NextResponse.json({
             success: true,
-            message: `Sucessfully embedded and added chunks to db`,
-            namespace
+            message: `File sucessfully uploaded. Start chatting..`,
         })
     } catch (error) {
         console.log("Error in /pdf/upload : ", error)
-        return NextResponse.json({
-            error: "Unable to complete request at this moment"
-        }, { status: 500 })
+        return NextResponse.json(
+            {
+                success: false,
+                message: "Unable to complete request at this moment"
+            },
+            { status: 500 }
+        )
     }
 
 }
